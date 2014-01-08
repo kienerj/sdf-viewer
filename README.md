@@ -19,6 +19,24 @@ chemical structures.
 * row index column
 * selected rows can be copy & pasted into Excel (Structure as SMILES)
 
+## Screenshots
+
+### Properties and row height
+
+Below images shows all the properties in the SD-file and the last row is higher
+to better fit the larger molecule:
+
+![variable row height](https://googledrive.com/host/0B1KuZlTEmhZNam93R1FRSFBWX28/propertiesAndRowHeight.png)
+
+### Viewing large SD-Files
+
+This screenshot is an example of a rather large file. See the row number on the
+left side of the table:
+
+![large file example](https://googledrive.com/host/0B1KuZlTEmhZNam93R1FRSFBWX28/largeFileExample.png)
+
+Scrolling remains smooth with very reasonable memory usage.
+
 ## Miscellaneous
 
 The application creates an .index file for each sd-file you load. This file is
