@@ -44,18 +44,7 @@ public class SdfTable extends JTable {
 
     public SdfTable(JScrollPane scrollPane, SdfReader sdfReader, int rowHeight) {
         super();
-        DefaultTableCellRenderer r = new DefaultTableCellRenderer() {
-            @Override
-            public void setValue(Object value) {
-                if (value instanceof ImageIcon) {
-                    setIcon((ImageIcon) value);
-                    setText("");
-                } else {
-                    setIcon(null);
-                    super.setValue(value);
-                }
-            }
-        };
+        DefaultTableCellRenderer r = new SdfTableCellRenderer();
         setDefaultRenderer(Object.class, r);
         TableRowResizer rowResizer = new TableRowResizer(this);
         AllRowsResizer allRowsResizer = new AllRowsResizer(this);
@@ -74,22 +63,7 @@ public class SdfTable extends JTable {
         headerTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         headerTable.setPreferredScrollableViewportSize(new Dimension(60, 0));
         headerTable.getColumnModel().getColumn(0).setPreferredWidth(60);
-        headerTable.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable t, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
-                boolean selected = t.getSelectionModel().isSelectedIndex(row);
-                Component component = t.getTableHeader().getDefaultRenderer().getTableCellRendererComponent(t, value, false, false, -1, -2);
-                ((JLabel) component).setHorizontalAlignment(SwingConstants.CENTER);
-                if (selected) {
-                    component.setFont(component.getFont().deriveFont(Font.BOLD));
-                    component.setForeground(Color.red);
-                } else {
-                    component.setFont(component.getFont().deriveFont(Font.PLAIN));
-                }
-                return component;
-            }
-        });
+        headerTable.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderCellRenderer());
         // synchronize selection by using the same selection model in both tables
         headerTable.setSelectionModel(this.getSelectionModel());
         scrollPane.setRowHeaderView(headerTable);
@@ -115,6 +89,40 @@ public class SdfTable extends JTable {
         super.setRowHeight(row, rowHeight);
         if (headerTable != null) {
             headerTable.setRowHeight(row, rowHeight);
+        }
+    }
+
+    private class SdfTableCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof ImageIcon) {
+                setIcon((ImageIcon) value);
+                setText("");
+            } else {
+                setIcon(null);
+                super.setValue(value);
+            }
+        }
+    }
+
+    private class RowHeaderCellRenderer implements TableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable t, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+
+            boolean selected = t.getSelectionModel().isSelectedIndex(row);
+            Component component = t.getTableHeader().getDefaultRenderer()
+                    .getTableCellRendererComponent(t, value, false, false, -1, -2);
+            ((JLabel) component).setHorizontalAlignment(SwingConstants.CENTER);
+            if (selected) {
+                component.setFont(component.getFont().deriveFont(Font.BOLD));
+                component.setForeground(Color.red);
+            } else {
+                component.setFont(component.getFont().deriveFont(Font.PLAIN));
+            }
+            return component;
         }
     }
 }
