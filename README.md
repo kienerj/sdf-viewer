@@ -14,9 +14,10 @@ chemical structures.
 
 ## Features
 
-* tabular display of record in the file including all properties
+* tabular display of records in the file including all properties
 * resizeable chemical structure image column
 * row index column
+* selected rows can be copy & pasted into Excel (Structure as SMILES)
 
 ## Miscellaneous
 
