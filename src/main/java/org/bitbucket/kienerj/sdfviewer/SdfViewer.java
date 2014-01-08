@@ -57,6 +57,8 @@ public class SdfViewer extends javax.swing.JFrame {
         loadFileMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Free SDF Viewer");
+        setAutoRequestFocus(false);
 
         jScrollPane1.setViewportView(jTable1);
 
