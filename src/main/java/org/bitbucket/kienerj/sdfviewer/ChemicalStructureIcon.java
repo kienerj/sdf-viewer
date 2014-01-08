@@ -70,10 +70,42 @@ public class ChemicalStructureIcon extends ImageIcon {
         this.height = height;
         indigo.setOption("render-image-size", width, height);
         IndigoObject mol = indigo.loadMolecule(structureData);
-        this.smiles = mol.canonicalSmiles();
+        this.smiles = getSmiles(mol);
         setDescription(smiles);
         Image image = renderImage();
         setImage(image);
+    }
+
+    private String getSmiles(IndigoObject mol) {
+        String smiles = mol.canonicalSmiles();
+        /*
+         * Indigo may add SMILES extensions after the smiles string separated by
+         * a space.
+         * As example molfiles with stereo bonds but without chiral flag
+         * get converted to smiles that have additional stereo info at end of
+         * string:
+         *
+         * "CC[C@@H](N)[C@@H](O)CC |&1:2,4|"
+         *
+         * see http://www.chemaxon.com/marvin/help/formats/cxsmiles-doc.html
+         *      - AND stereo group type:
+         *          &<group>:<atomindex>,< atomindex>...
+         *
+         * This happens for non-chiral molecules with up/down bonds.
+         *
+         * if chiral flag is set, absolute stereo chemistry is assumed
+         * and no SMILES extension is set.
+         * Chiral flag is on molfile line 4, the 5th option (the 1):
+         *      8  8  0  0  1  0  0  0  0  0999 V2000
+         *
+         * Below we optionally remove the extensions as they do not belong to
+         * the smiles specification. In above case they are from chemaxon.
+         */
+        int firstSpaceIndex = smiles.indexOf(" ");
+        if (firstSpaceIndex != -1) {
+            smiles = smiles.substring(0, firstSpaceIndex);
+        }
+        return smiles;
     }
 
     /**
