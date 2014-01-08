@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -92,18 +93,8 @@ public class SdfTable extends JTable {
                 return component;
             }
         });
-//        getRowSorter().addRowSorterListener(new RowSorterListener() {
-//            @Override
-//            public void sorterChanged(RowSorterEvent e) {
-//                headerModel.fireTableDataChanged();
-//            }
-//        });
-        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                headerModel.fireTableRowsUpdated(0, headerModel.getRowCount() - 1);
-            }
-        });
+        // synchronize selection by using the same selection model in both tables
+        headerTable.setSelectionModel(this.getSelectionModel());
         scrollPane.setRowHeaderView(headerTable);
         setPreferredScrollableViewportSize(getPreferredSize());
     }
