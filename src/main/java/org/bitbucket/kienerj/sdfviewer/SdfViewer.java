@@ -16,11 +16,29 @@
  */
 package org.bitbucket.kienerj.sdfviewer;
 
+import java.awt.Cursor;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
+import lombok.Getter;
+import lombok.Setter;
 import org.bitbucket.kienerj.sdfreader.SdfReader;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -32,13 +50,32 @@ import org.slf4j.ext.XLoggerFactory;
 public class SdfViewer extends javax.swing.JFrame {
 
     private static final XLogger logger = XLoggerFactory.getXLogger("SdfViewer");
+    private static final String SETTINGS_FILE = "FreeSdfViewer.properties";
     private SdfReader sdfReader;
+    @Getter
+    @Setter
+    private File lastOpenDir;
+    private File settingsDir;
 
     /**
      * Creates new form SdfViewer
      */
     public SdfViewer() {
+
+        // save settingsFile on shutdown
+        addShutdownHook();
+        //determine directory of settings
+        // local app data for windows else same dir as this executable jar.
+        setSettingsDir();
+        // load settings
+        loadSettings();
+
         initComponents();
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(sdfFileFilter);
+        if (lastOpenDir != null) {
+            fileChooser.setCurrentDirectory(lastOpenDir);
+        }
     }
 
     /**
@@ -94,28 +131,87 @@ public class SdfViewer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void loadFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFileMenuItemActionPerformed
-        // TODO add your handling code here:
-        int returnVal = fileChoser.showOpenDialog(this);
+
+        int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fileChoser.getSelectedFile();
+            File file = fileChooser.getSelectedFile();
             logger.debug("Opening SD-File '{}'.", file.getAbsoluteFile());
-            try {
-                sdfReader = new SdfReader(file);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this,
-                        ex.getMessage(),
-                        "Error opening file",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
+            SdfLoader loader = new SdfLoader(this, file);
+            loader.execute();
+        } else {
+            logger.debug("Opening of SD-file cancelled by the user.");
+        }
+    }//GEN-LAST:event_loadFileMenuItemActionPerformed
+
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            SdfViewer viewer;
+
+            @Override
+            public void run() {
+                viewer.saveSettings();
+            }
+
+            private Thread init(SdfViewer viewer) {
+                this.viewer = viewer;
+                return this;
+            }
+        }.init(this));
+    }
+
+    private void setSettingsDir() {
+        String OS = (System.getProperty("os.name")).toUpperCase();
+        if (OS.contains("WIN")) {
+            // save settings in appdata
+            settingsDir = new File(System.getenv("LOCALAPPDATA")
+                    + "/FreeSdfViewer");
+            if (!settingsDir.exists()) {
+                boolean success = settingsDir.mkdir();
+                if (!success) {
+                    // directory were this jar file is stored
+                    // use it to save settings to same dir.
+                    settingsDir = new File(ClassLoader.getSystemClassLoader()
+                            .getResource(".").getPath());
+                }
             }
         } else {
-            logger.debug("Opening of SD-File cancelled by user.");
-            return;
+            // directory were this jar file is stored
+            // use it to save settings to same dir.
+            settingsDir = new File(ClassLoader.getSystemClassLoader()
+                    .getResource(".").getPath());
         }
+    }
 
-        jTable1 = new SdfTable(jScrollPane1, sdfReader, 200);
-        jScrollPane1.setViewportView(jTable1);
-    }//GEN-LAST:event_loadFileMenuItemActionPerformed
+    private void saveSettings() {
+        Properties properties = new Properties();
+
+        properties.put("lastOpenDir", lastOpenDir.getPath());
+
+        try (FileOutputStream out = new FileOutputStream(settingsDir + "/" + SETTINGS_FILE);) {
+            properties.store(out, null);
+        } catch (IOException ex) {
+            logger.error("Failed to save settings:");
+            logger.catching(ex);
+        }
+    }
+
+    private void loadSettings() {
+        Properties settings = new Properties();
+        File settingsFile = new File(settingsDir + "/" + SETTINGS_FILE);
+        if (settingsFile.exists()) {
+            try (FileInputStream in = new FileInputStream(settingsFile);) {
+                settings.load(in);
+                String lastOpenDirPath = settings.getProperty("lastOpenDir");
+                lastOpenDir = new File(lastOpenDirPath);
+                if (!lastOpenDir.exists()) {
+                    lastOpenDir = null;
+                }
+            } catch (IOException ex) {
+                logger.error("Failed to load settings:");
+                logger.catching(ex);
+            }
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -147,7 +243,50 @@ public class SdfViewer extends javax.swing.JFrame {
             }
         });
     }
-    private final JFileChooser fileChoser = new JFileChooser();
+
+    private class SdfLoader extends SwingWorker<JTable, Void> {
+
+        private final JFrame frame;
+        private final File sdFile;
+        private JTable table;
+        private IOException ioException;
+
+        public SdfLoader(JFrame frame, File sdFile) {
+            this.frame = frame;
+            frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            this.sdFile = sdFile;
+        }
+
+        @Override
+        public JTable doInBackground() {
+            try {
+                sdfReader = new SdfReader(sdFile);
+                lastOpenDir = sdFile.getParentFile();
+                table = new SdfTable(jScrollPane1, sdfReader, 200);
+            } catch (IOException ex) {
+                logger.catching(ex);
+                ioException = ex;
+                table = jTable1;
+            }
+            return table;
+        }
+
+        @Override
+        public void done() {
+            if (ioException == null) {
+                jTable1 = table;
+                jScrollPane1.setViewportView(table);
+                frame.setCursor(Cursor.getDefaultCursor());
+            } else {
+                JOptionPane.showMessageDialog(SdfViewer.this,
+                        ioException.getMessage(),
+                        "Error opening file",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    private final JFileChooser fileChooser = new JFileChooser();
+    private final FileFilter sdfFileFilter = new SdfFileFilter();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
