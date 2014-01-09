@@ -252,6 +252,10 @@ public class SdfViewer extends javax.swing.JFrame {
         @Override
         public JTable doInBackground() {
             try {
+                //close old file
+                if (sdfReader != null) {
+                    sdfReader.close();
+                }
                 sdfReader = new SdfReader(sdFile);
                 lastOpenDir = sdFile.getParentFile();
                 table = new SdfTable(jScrollPane1, sdfReader, 200);
