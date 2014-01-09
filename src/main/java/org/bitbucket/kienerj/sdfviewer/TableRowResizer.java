@@ -21,15 +21,13 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-
 /**
- * <p>
- * Allows the user to resize individual rows in a JTable.
+ * <p> Allows the user to resize individual rows in a JTable. </p>
+ *
+ * <p>This code was shamelessly taken from <a
+ * href="http://stackoverflow.com/questions/4387995/adjusting-individual-row-height-using-cursor-on-jtable">stackoverflow</a>.
  * </p>
  *
- * <p>This code was shamelessly taken from
- * <a href="http://stackoverflow.com/questions/4387995/adjusting-individual-row-height-using-cursor-on-jtable">stackoverflow</a>.
- * </p>
  * @author Joos Kiener <Joos.Kiener@gmail.com>
  */
 public class TableRowResizer extends MouseInputAdapter {
@@ -71,10 +69,18 @@ public class TableRowResizer extends MouseInputAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        table.setRowSelectionAllowed(false);
         Point p = e.getPoint();
-
         resizingRow = getResizingRow(p);
         mouseYOffset = p.y - table.getRowHeight(resizingRow);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        table.setRowSelectionAllowed(true);
     }
 
     private void swapCursor() {
@@ -93,6 +99,7 @@ public class TableRowResizer extends MouseInputAdapter {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        table.clearSelection();
         int mouseY = e.getY();
 
         if (resizingRow >= 0) {
