@@ -71,7 +71,7 @@ public class AllRowsResizer extends MouseInputAdapter {
                 return false;
             }
 
-            Boolean result = ((header.getY() + header.getHeight()) - 20) < p.y;
+            Boolean result = ((header.getY() + header.getHeight()) - 5) < p.y;
             logger.debug(result.toString());
             return result;
 
@@ -86,7 +86,7 @@ public class AllRowsResizer extends MouseInputAdapter {
                 if (col == -1) {
                     return false;
                 }
-                Rectangle r = getCellRectangle(row, col);
+                Rectangle r = table.getCellRect(row, col, true);
                 r.grow(0, -5);
                 return r.y > p.y;
 
@@ -100,15 +100,15 @@ public class AllRowsResizer extends MouseInputAdapter {
         isResizing = isResizingHeader(e);
         yOffset = e.getYOnScreen();
         topRow = getTopRow();
-        if (isResizing) {
+        if (isResizing) {            
             table.setAutoscrolls(false);
-        }
+        } 
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isResizing) {
-            table.setAutoscrolls(true);
+            table.setAutoscrolls(true);            
             if (table.getCursor() == resizeCursor) {
                 swapCursor();
             }
@@ -116,7 +116,7 @@ public class AllRowsResizer extends MouseInputAdapter {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent e) {        
         if (isResizingHeader(e)
                 != (table.getCursor() == resizeCursor)) {
             swapCursor();
@@ -153,36 +153,36 @@ public class AllRowsResizer extends MouseInputAdapter {
         tableCursor = tmp;
     }
 
-    /**
-     * Get the rectangle of the visible part of the given table cell. The top
-     * row might only be partially visible.
-     *
-     * @param row
-     * @param col
-     * @return
-     */
-    private Rectangle getCellRectangle(int row, int col) {
-        if (!(table.getParent() instanceof JViewport)) {
-            return table.getCellRect(row, col, true);
-        }
-
-        JViewport viewport = (JViewport) table.getParent();
-        // This rectangle is relative to the table where the
-        // northwest corner of cell (0,0) is always (0,0)
-        Rectangle rect = table.getCellRect(row, col, true);
-        // The location of the viewport relative to the table
-        Point pt = viewport.getViewPosition();
-        // Translate the cell location so that it is relative
-        // to the view, assuming the northwest corner of the
-        // view is (0,0)
-        //rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-        int difference = rect.y - pt.y;
-        if (difference < 0) {
-            //row only partially visiable
-            rect.y = rect.y + difference; // move down
-            rect.height = rect.height - difference; // make smaller
-        }
-        // Check if view completely contains the row
-        return rect;
-    }
+//    /**
+//     * Get the rectangle of the visible part of the given table cell. The top
+//     * row might only be partially visible.
+//     *
+//     * @param row
+//     * @param col
+//     * @return
+//     */
+//    private Rectangle getCellRectangle(int row, int col) {
+//        if (!(table.getParent() instanceof JViewport)) {
+//            return table.getCellRect(row, col, true);
+//        }
+//
+//        JViewport viewport = (JViewport) table.getParent();
+//        // This rectangle is relative to the table where the
+//        // northwest corner of cell (0,0) is always (0,0)
+//        Rectangle rect = table.getCellRect(row, col, true);
+//        // The location of the viewport relative to the table
+//        Point pt = viewport.getViewPosition();
+//        // Translate the cell location so that it is relative
+//        // to the view, assuming the northwest corner of the
+//        // view is (0,0)
+//        //rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+//        int difference = rect.y - pt.y;
+//        if (difference < 0) {
+//            //row only partially visiable
+//            rect.y = rect.y - difference; // move down
+//            rect.height = rect.height + difference; // make smaller
+//        }
+//        // Check if view completely contains the row
+//        return rect;
+//    }
 }
