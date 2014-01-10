@@ -69,10 +69,13 @@ public class TableRowResizer extends MouseInputAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        table.setRowSelectionAllowed(false);
         Point p = e.getPoint();
         resizingRow = getResizingRow(p);
         mouseYOffset = p.y - table.getRowHeight(resizingRow);
+        if (resizingRow >= 0) {
+            table.setRowSelectionAllowed(false);
+            table.setAutoscrolls(false);
+        }
     }
 
     /**
@@ -80,7 +83,10 @@ public class TableRowResizer extends MouseInputAdapter {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        table.setRowSelectionAllowed(true);
+        if (resizingRow >= 0) {
+            table.setRowSelectionAllowed(true);
+            table.setAutoscrolls(true);
+        }
     }
 
     private void swapCursor() {
