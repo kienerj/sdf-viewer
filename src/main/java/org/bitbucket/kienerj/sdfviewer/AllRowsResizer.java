@@ -42,6 +42,7 @@ public class AllRowsResizer extends MouseInputAdapter {
     private int yOffset;
     private int topRow;
     private Cursor tableCursor = resizeCursor;
+    private Cursor headerCursor = resizeCursor;
     private JTable table;
 
     public AllRowsResizer(JTable table) {
@@ -53,26 +54,21 @@ public class AllRowsResizer extends MouseInputAdapter {
     }
 
     private boolean isResizingHeader(MouseEvent e) {
-
+        logger.entry(e);
         Point p = e.getPoint();
 
         Object source = e.getSource();
         JTableHeader header = table.getTableHeader();
 
-        if (source instanceof JTableHeader
-                && header.contains(p)) {
+        if (source instanceof JTableHeader) {
 
-            logger.debug("Mouse in Table header.");
-            logger.debug("Headerheight: {}", header.getHeight());
-            logger.debug("Header Y: {}", header.getY());
-            logger.debug("Point Y: {}", p.y);
             int col = table.columnAtPoint(p);
             if (col == -1) {
                 return false;
             }
 
-            Boolean result = ((header.getY() + header.getHeight()) - 5) < p.y;
-            logger.debug(result.toString());
+            boolean result = ((header.getY() + header.getHeight()) - 5) < p.y;
+            logger.exit(result);
             return result;
 
         } else if (source instanceof JTable) {
@@ -88,43 +84,60 @@ public class AllRowsResizer extends MouseInputAdapter {
                 }
                 Rectangle r = table.getCellRect(row, col, true);
                 r.grow(0, -5);
-                return r.y > p.y;
+                boolean result = r.y > p.y;
+                logger.exit(result);
+                return result;
 
             }
         }
+        logger.exit(false);
         return false;
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        logger.entry(e);
         isResizing = isResizingHeader(e);
         yOffset = e.getYOnScreen();
         topRow = getTopRow();
-        if (isResizing) {            
+        if (isResizing) {
             table.setAutoscrolls(false);
-        } 
+        }
+        logger.exit();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        logger.entry(e);
         if (isResizing) {
-            table.setAutoscrolls(true);            
+            table.setAutoscrolls(true);
             if (table.getCursor() == resizeCursor) {
-                swapCursor();
+                swapTableCursor();
             }
         }
+        logger.exit();
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {        
-        if (isResizingHeader(e)
-                != (table.getCursor() == resizeCursor)) {
-            swapCursor();
+    public void mouseMoved(MouseEvent e) {
+        logger.entry(e);
+        if (e.getSource() instanceof JTable) {
+            if (isResizingHeader(e)
+                    != (table.getCursor() == resizeCursor)) {
+                swapTableCursor();
+            }
+        } else if (e.getSource() instanceof JTableHeader) {
+            if (isResizingHeader(e)
+                    != (table.getTableHeader().getCursor() == resizeCursor)) {
+                swapHeaderCursor();
+            }
         }
+        logger.exit();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        logger.entry(e);
         int mouseY = e.getYOnScreen();
         if (isResizing) {
             int newHeight = table.getRowHeight() + (mouseY - yOffset);
@@ -139,6 +152,19 @@ public class AllRowsResizer extends MouseInputAdapter {
                 scrollPane.getVerticalScrollBar().setValue(rect.y);
             }
         }
+        logger.exit();
+    }
+
+    private void swapTableCursor() {
+        Cursor tmp = table.getCursor();
+        table.setCursor(tableCursor);
+        tableCursor = tmp;
+    }
+
+    private void swapHeaderCursor() {
+        Cursor tmp = table.getTableHeader().getCursor();
+        table.getTableHeader().setCursor(headerCursor);
+        headerCursor = tmp;
     }
 
     private int getTopRow() {
@@ -146,13 +172,6 @@ public class AllRowsResizer extends MouseInputAdapter {
         Point pViewport = viewport.getViewPosition();
         return table.rowAtPoint(pViewport);
     }
-
-    private void swapCursor() {
-        Cursor tmp = table.getCursor();
-        table.setCursor(tableCursor);
-        tableCursor = tmp;
-    }
-
 //    /**
 //     * Get the rectangle of the visible part of the given table cell. The top
 //     * row might only be partially visible.
