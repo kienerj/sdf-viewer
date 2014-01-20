@@ -137,7 +137,7 @@ public class ChemicalStructureIcon extends ImageIcon {
 
         if (w != width || h != height) {
             if (w < 16 || h < 16) {
-                // 16 pixels is minsize supported by indigo
+                // 16 pixels is minimum size supported by indigo
                 return;
             }
             width = w;

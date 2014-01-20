@@ -77,7 +77,6 @@ public class AllRowsResizer extends MouseInputAdapter {
             int row = table.rowAtPoint(p);
 
             if (row == topRow) {
-                logger.debug("Mouse in top row.");
                 int col = table.columnAtPoint(p);
                 if (col == -1) {
                     return false;
