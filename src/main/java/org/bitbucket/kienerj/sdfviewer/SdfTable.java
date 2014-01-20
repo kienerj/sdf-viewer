@@ -56,7 +56,7 @@ public class SdfTable extends JTable {
 
         //sorter = new TableRowSorter<>(getModel());
         //setRowSorter(sorter);
-        headerModel = new RowHeaderModel(this);
+        headerModel = new RowHeaderModel(getRowCount());
         headerTable = new JTable(headerModel);
         headerTable.setRowHeight(getRowHeight());
         headerTable.setShowGrid(false);

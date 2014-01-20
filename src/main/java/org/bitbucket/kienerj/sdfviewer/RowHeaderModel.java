@@ -16,16 +16,15 @@
  */
 package org.bitbucket.kienerj.sdfviewer;
 
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 public class RowHeaderModel extends DefaultTableModel {
 
     private final int rowCount;
 
-    public RowHeaderModel(JTable table) {
+    public RowHeaderModel(int rowCount) {
         super();
-        this.rowCount = table.getRowCount();
+        this.rowCount = rowCount;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class RowHeaderModel extends DefaultTableModel {
     public Class<?> getColumnClass(int colNum) {
         switch (colNum) {
             case 0:
-                return String.class;
+                return Integer.class;
             default:
                 return super.getColumnClass(colNum);
         }
