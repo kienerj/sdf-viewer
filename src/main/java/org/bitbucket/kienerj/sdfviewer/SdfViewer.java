@@ -29,6 +29,7 @@ import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileSystemView;
 import lombok.Getter;
 import lombok.Setter;
 import org.bitbucket.kienerj.sdfreader.SdfReader;
@@ -48,12 +49,12 @@ public class SdfViewer extends javax.swing.JFrame {
     @Setter
     private File lastOpenDir;
     private File settingsDir;
+    private Boolean keepIndex = false;
 
     /**
      * Creates new form SdfViewer
      */
     public SdfViewer() {
-
         // save settingsFile on shutdown
         addShutdownHook();
         //determine directory of settings
@@ -63,6 +64,7 @@ public class SdfViewer extends javax.swing.JFrame {
         loadSettings();
 
         initComponents();
+        saveIndexMenuItem.setState(keepIndex);
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setFileFilter(sdfFileFilter);
         if (lastOpenDir != null) {
@@ -84,6 +86,8 @@ public class SdfViewer extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         loadFileMenuItem = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        saveIndexMenuItem = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Free SDF Viewer");
@@ -103,6 +107,19 @@ public class SdfViewer extends javax.swing.JFrame {
         jMenu1.add(loadFileMenuItem);
 
         jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Settings");
+
+        saveIndexMenuItem.setSelected(true);
+        saveIndexMenuItem.setText("Save Index");
+        saveIndexMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveIndexMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(saveIndexMenuItem);
+
+        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -134,6 +151,13 @@ public class SdfViewer extends javax.swing.JFrame {
             logger.debug("Opening of SD-file cancelled by the user.");
         }
     }//GEN-LAST:event_loadFileMenuItemActionPerformed
+
+    private void saveIndexMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveIndexMenuItemActionPerformed
+        keepIndex = saveIndexMenuItem.getState();
+        if (sdfReader != null) {
+            sdfReader.setSaveIndex(keepIndex);
+        }
+    }//GEN-LAST:event_saveIndexMenuItemActionPerformed
 
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -177,7 +201,10 @@ public class SdfViewer extends javax.swing.JFrame {
     private void saveSettings() {
         Properties properties = new Properties();
 
-        properties.put("lastOpenDir", lastOpenDir.getPath());
+        if (lastOpenDir != null) {
+            properties.put("lastOpenDir", lastOpenDir.getPath());
+        }
+        properties.put("keepIndex", keepIndex.toString());
 
         try (FileOutputStream out = new FileOutputStream(settingsDir + "/" + SETTINGS_FILE);) {
             properties.store(out, null);
@@ -193,11 +220,14 @@ public class SdfViewer extends javax.swing.JFrame {
         if (settingsFile.exists()) {
             try (FileInputStream in = new FileInputStream(settingsFile);) {
                 settings.load(in);
-                String lastOpenDirPath = settings.getProperty("lastOpenDir");
+                FileSystemView fw = fileChooser.getFileSystemView(); // for default open directory
+                String lastOpenDirPath = settings.getProperty("lastOpenDir", fw.getDefaultDirectory().toString());
                 lastOpenDir = new File(lastOpenDirPath);
                 if (!lastOpenDir.exists()) {
                     lastOpenDir = null;
                 }
+                String keepIndexSetting = settings.getProperty("keepIndex", keepIndex.toString());
+                keepIndex = Boolean.valueOf(keepIndexSetting);
             } catch (IOException ex) {
                 logger.error("Failed to load settings:");
                 logger.catching(ex);
@@ -256,7 +286,7 @@ public class SdfViewer extends javax.swing.JFrame {
                 if (sdfReader != null) {
                     sdfReader.close();
                 }
-                sdfReader = new SdfReader(sdFile);
+                sdfReader = new SdfReader(sdFile, keepIndex);
                 lastOpenDir = sdFile.getParentFile();
                 table = new SdfTable(jScrollPane1, sdfReader, 200);
             } catch (IOException ex) {
@@ -285,9 +315,11 @@ public class SdfViewer extends javax.swing.JFrame {
     private final FileFilter sdfFileFilter = new SdfFileFilter();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JMenuItem loadFileMenuItem;
+    private javax.swing.JCheckBoxMenuItem saveIndexMenuItem;
     // End of variables declaration//GEN-END:variables
 }
