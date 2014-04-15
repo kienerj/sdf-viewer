@@ -21,6 +21,7 @@ import com.ggasoftware.indigo.IndigoRenderer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
@@ -144,7 +145,7 @@ public class SdfTableModel extends AbstractTableModel {
 
         if (columnIndex == 0) {
             String molfile = record.getMolfile();
-            ImageIcon chemicalStructure = new ChemicalStructureIcon(molfile,indigo,renderer,imageWidth, imageHeight);
+            ImageIcon chemicalStructure = new ChemicalStructureIcon(molfile, indigo, renderer, imageWidth, imageHeight);
             logger.exit(chemicalStructure);
             return chemicalStructure;
 
@@ -176,23 +177,48 @@ public class SdfTableModel extends AbstractTableModel {
             rowCache.clear();
             firstRow = cacheLowerBound;
             lastRow = cacheLowerBound + CACHE_SIZE;
+            addRowsToCache(firstRow, lastRow);
+            this.cacheLowerBound = cacheLowerBound;
         } else if (this.cacheLowerBound - cacheLowerBound < 0) {
             // scroll down (to bigger index)
             removeFromCache(this.cacheLowerBound, LOAD_THRESHOLD);
             firstRow = cacheLowerBound + CACHE_SIZE - LOAD_THRESHOLD;
             lastRow = cacheLowerBound + CACHE_SIZE - 1;
+            addRowsToCache(firstRow, lastRow);
+            this.cacheLowerBound = cacheLowerBound;
         } else if (this.cacheLowerBound - cacheLowerBound > 0) {
             //scroll up (to smaller index)
             removeFromCache(this.cacheLowerBound + CACHE_SIZE - LOAD_THRESHOLD, LOAD_THRESHOLD);
             firstRow = cacheLowerBound;
             lastRow = cacheLowerBound + LOAD_THRESHOLD - 1;
+            addRowsToCache(firstRow, lastRow);
+            this.cacheLowerBound = cacheLowerBound;
         }
-        List<SdfRecord> records = sdfReader.getRecords(firstRow, lastRow);
-        for (SdfRecord record : records) {
-            rowCache.put(record.getIndex(), record);
-        }
-        this.cacheLowerBound = cacheLowerBound;
+//        else if (this.cacheLowerBound == cacheLowerBound) {
+//              // do nothing as cache is already correct
+//        }
         logger.exit();
+    }
+
+    private void addRowsToCache(int firstRow, int lastRow) {
+        logger.entry(firstRow, lastRow);
+        try {
+            List<SdfRecord> records = sdfReader.getRecords(firstRow, lastRow);
+            for (SdfRecord record : records) {
+                rowCache.put(record.getIndex(), record);
+            }
+            logger.exit();
+        } catch (NoSuchElementException ex) {
+            //cacheLowerBound is bigger than sdfReader.size(). Load cache with
+            // last CACHE_SIZE records
+            rowCache.clear();
+            this.cacheLowerBound = sdfReader.size() - CACHE_SIZE;
+            List<SdfRecord> records = sdfReader.getRecords(this.cacheLowerBound, sdfReader.size() - 1);
+            for (SdfRecord record : records) {
+                rowCache.put(record.getIndex(), record);
+            }
+            logger.exit();
+        }
     }
 
     private void removeFromCache(int startIndex, int numRecords) {
