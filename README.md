@@ -39,10 +39,10 @@ Scrolling remains smooth with very reasonable memory usage.
 
 ## Miscellaneous
 
-The application creates an .index file for each sd-file you load. This file is
-created only once and loading the same file again later will be much quicker.
-You may safely delete it. A future version will have the option to auto-remove
-this index file when closing the application.
+The application can create an .index file for each sd-file you load. This is set
+in the settings menu. By default the index is not saved. This file is created 
+only once and loading the same file (must be unchanged!!!) again later will be 
+much quicker. You may safely delete it. 
 
 For rendering the chemical structures the [Indigo toolkit][1] is used.
 
