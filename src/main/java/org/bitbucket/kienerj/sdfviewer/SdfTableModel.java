@@ -56,7 +56,7 @@ public class SdfTableModel extends AbstractTableModel {
         if (columns.isEmpty()) {
             columns.add("Structure");
         } else {
-            columns.set(0, "Structure");
+            columns.add(0, "Structure");
         }
         this.columns = columns;
         this.indigo = new Indigo();
