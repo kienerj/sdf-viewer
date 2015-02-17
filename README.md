@@ -46,4 +46,17 @@ much quicker. You may safely delete it.
 
 For rendering the chemical structures the [Indigo toolkit][1] is used.
 
+## Trouble-shooting
+
+When opening very large sd-files (million+ molecules) the file might not load.
+In that case you need to close the application and start it from the command-line
+so that you can increase the memory available to FreeSDFViewer. On the 
+command-line enter
+
+`javaw -Xmx512m -jar "C:\Program Files\FreeSDFViewer.jar"`
+
+You must add the full path. Above assumes Windows and that you put the jar file
+into the Program Files folder. If it still does not load increase the number in
+`-Xmx512m` further. It denotes amount of memory to use in megabytes.
+
 [1]: http://ggasoftware.com/opensource/indigo
