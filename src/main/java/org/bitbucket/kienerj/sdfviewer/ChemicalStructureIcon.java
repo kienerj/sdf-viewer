@@ -156,7 +156,9 @@ public class ChemicalStructureIcon extends ImageIcon {
         if (structureData != null) {
             IndigoObject mol = indigo.loadMolecule(structureData);
             if (mol != null) {
-                mol.layout();
+                if (!mol.hasCoord()) {
+                    mol.layout();
+                }
                 byte[] imageData = renderer.renderToBuffer(mol);
                 // see ImageIcon constructor
                 image = Toolkit.getDefaultToolkit().createImage(imageData);
