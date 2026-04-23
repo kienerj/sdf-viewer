@@ -4,16 +4,16 @@
 
     <groupId>org.bitbucket.kienerj</groupId>
     <artifactId>sdf-viewer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>sdf-viewer</name>
-    <url>http://maven.apache.org</url>
+    <url>https://maven.apache.org</url>
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.8.0</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -22,11 +22,11 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
-                            <mainClass>org.bitbucket.kienerj.sdfviewer.SdfViewer</mainClass>
+                            <mainClass>io.github.kienerj.sdf_viewer.SdfViewer</mainClass>
                         </manifest>
-                        <manifestEntries>
-                            <Mercurial-Revision>${changeSet}</Mercurial-Revision>
-                        </manifestEntries>
+<!--                        <manifestEntries>-->
+<!--                            <Mercurial-Revision>${changeSet}</Mercurial-Revision>-->
+<!--                        </manifestEntries>-->
                     </archive>
                 </configuration>
                 <executions>
@@ -42,21 +42,23 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.15.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <release>21</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.2</version>
+                <version>3.3.0</version>
+                <configuration>
+                    <shortRevisionLength>7</shortRevisionLength>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>hgchangeset</goal>
+                            <goal>create</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -72,29 +74,29 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.46</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-ext</artifactId>
-            <version>1.7.6</version>
+            <version>2.0.17</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sdf-reader</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ggasoftware.indigo</groupId>
+            <groupId>com.epam.indigo</groupId>
             <artifactId>indigo-renderer</artifactId>
-            <version>1.1.11</version>
+            <version>1.40.0</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.1</version>
+            <version>1.5.31</version>
         </dependency>
     </dependencies>
 </project>
