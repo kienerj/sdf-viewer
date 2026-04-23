@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bitbucket.kienerj.sdfreader;
+package io.github.kienerj.sdf_reader;
 
 import java.io.File;
 import java.io.IOException;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.bitbucket.kienerj.io;
+package io.github.kienerj.io;
 
 import java.io.EOFException;
 import java.io.FileDescriptor;
