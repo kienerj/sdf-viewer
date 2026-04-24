@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import org.bitbucket.kienerj.sdfreader.SdfReader;
+import io.github.kienerj.sdf_reader.SdfReader;
 
 /**
  *

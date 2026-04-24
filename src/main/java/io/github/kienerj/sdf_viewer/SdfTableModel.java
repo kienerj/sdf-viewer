@@ -16,8 +16,8 @@
  */
 package io.github.kienerj.sdf_viewer;
 
-import com.ggasoftware.indigo.Indigo;
-import com.ggasoftware.indigo.IndigoRenderer;
+import com.epam.indigo.Indigo;
+import com.epam.indigo.IndigoRenderer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,8 +25,8 @@ import java.util.NoSuchElementException;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
-import org.bitbucket.kienerj.sdfreader.SdfReader;
-import org.bitbucket.kienerj.sdfreader.SdfRecord;
+import io.github.kienerj.sdf_reader.SdfReader;
+import io.github.kienerj.sdf_reader.SdfRecord;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 

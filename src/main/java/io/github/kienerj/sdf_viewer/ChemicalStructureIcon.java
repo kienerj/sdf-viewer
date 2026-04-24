@@ -16,9 +16,9 @@
  */
 package io.github.kienerj.sdf_viewer;
 
-import com.ggasoftware.indigo.Indigo;
-import com.ggasoftware.indigo.IndigoObject;
-import com.ggasoftware.indigo.IndigoRenderer;
+import com.epam.indigo.Indigo;
+import com.epam.indigo.IndigoObject;
+import com.epam.indigo.IndigoRenderer;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
