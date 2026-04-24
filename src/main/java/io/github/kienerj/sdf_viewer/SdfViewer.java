@@ -32,7 +32,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 import lombok.Getter;
 import lombok.Setter;
-import org.bitbucket.kienerj.sdfreader.SdfReader;
+import io.github.kienerj.sdf_reader.SdfReader;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 
