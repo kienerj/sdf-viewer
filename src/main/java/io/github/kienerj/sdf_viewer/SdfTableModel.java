@@ -67,6 +67,7 @@ public class SdfTableModel extends AbstractTableModel {
         indigo.setOption("render-margins", 5, 5);
         indigo.setOption("render-stereo-style", "none");
         indigo.setOption("render-image-size", imageWidth, imageHeight);
+        indigo.setOption("image-resolution", 300);
         // init row cache
         this.rowCache = new HashMap<>();
         updateRowCache(0, true);
