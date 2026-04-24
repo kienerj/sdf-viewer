@@ -9,6 +9,13 @@
 
     <name>sdf-viewer</name>
     <url>https://maven.apache.org</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/kienerj/sdf-viewer</connection>
+        <developerConnection>scm:git:https://github.com/kienerj/sdf-viewer</developerConnection>
+        <url>https://github.com/kienerj/sdf-viewer</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -52,7 +59,7 @@
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <doCheck>true</doCheck>
+                    <doCheck>false</doCheck>
                     <doUpdate>true</doUpdate>
                     <shortRevisionLength>7</shortRevisionLength>
                 </configuration>
