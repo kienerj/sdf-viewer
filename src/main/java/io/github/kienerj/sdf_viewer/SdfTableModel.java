@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
-import lombok.Getter;
 import io.github.kienerj.sdf_reader.SdfReader;
 import io.github.kienerj.sdf_reader.SdfRecord;
 import org.slf4j.ext.XLogger;
@@ -45,10 +44,8 @@ public class SdfTableModel extends AbstractTableModel {
     private final IndigoRenderer renderer;
     private final HashMap<Integer, SdfRecord> rowCache;
     private int cacheLowerBound = 0;
-    @Getter
-    private int imageWidth = 300;
-    @Getter
-    private int imageHeight = 150;
+    private final int imageWidth = 300;
+    private final int imageHeight = 150;
 
     public SdfTableModel(SdfReader sdfReader) {
         this.sdfReader = sdfReader;
@@ -56,7 +53,7 @@ public class SdfTableModel extends AbstractTableModel {
         if (columns.isEmpty()) {
             columns.add("Structure");
         } else {
-            columns.add(0, "Structure");
+            columns.addFirst("Structure");
         }
         this.columns = columns;
         this.indigo = new Indigo();
@@ -173,8 +170,8 @@ public class SdfTableModel extends AbstractTableModel {
             cacheLowerBound = 0;
         }
 
-        int firstRow = 0;
-        int lastRow = 0;
+        int firstRow;
+        int lastRow;
         if (reloadFully) {
             logger.debug("Reloading cache fully: clearing cache and adding new records.");
             rowCache.clear();

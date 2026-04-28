@@ -43,7 +43,7 @@ public class AllRowsResizer extends MouseInputAdapter {
     private int topRow;
     private Cursor tableCursor = resizeCursor;
     private Cursor headerCursor = resizeCursor;
-    private JTable table;
+    private final JTable table;
 
     public AllRowsResizer(JTable table) {
         this.table = table;
@@ -171,36 +171,4 @@ public class AllRowsResizer extends MouseInputAdapter {
         Point pViewport = viewport.getViewPosition();
         return table.rowAtPoint(pViewport);
     }
-//    /**
-//     * Get the rectangle of the visible part of the given table cell. The top
-//     * row might only be partially visible.
-//     *
-//     * @param row
-//     * @param col
-//     * @return
-//     */
-//    private Rectangle getCellRectangle(int row, int col) {
-//        if (!(table.getParent() instanceof JViewport)) {
-//            return table.getCellRect(row, col, true);
-//        }
-//
-//        JViewport viewport = (JViewport) table.getParent();
-//        // This rectangle is relative to the table where the
-//        // northwest corner of cell (0,0) is always (0,0)
-//        Rectangle rect = table.getCellRect(row, col, true);
-//        // The location of the viewport relative to the table
-//        Point pt = viewport.getViewPosition();
-//        // Translate the cell location so that it is relative
-//        // to the view, assuming the northwest corner of the
-//        // view is (0,0)
-//        //rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-//        int difference = rect.y - pt.y;
-//        if (difference < 0) {
-//            //row only partially visiable
-//            rect.y = rect.y - difference; // move down
-//            rect.height = rect.height + difference; // make smaller
-//        }
-//        // Check if view completely contains the row
-//        return rect;
-//    }
 }
