@@ -1,9 +1,7 @@
-# Free SDF Viewer
+# FreeSDFViewer
 
-Free SDF Viewer is a free and open-source desktop viewer for the chemical 
-structure file format sdf. It has good performance and also works with very 
-large SD-files. It is targeted at users that quickly want to look and scan 
-through any type of sd-file.
+FreeSDFViewer is a free and open-source desktop viewer for sd-files. It is targeted at users that quickly want to look and scan 
+through any type of sd-file including very large ones (>100k of entries).
 
 ## SD-files
 
@@ -17,25 +15,8 @@ chemical structures.
 * tabular display of records in the file including all properties
 * resizeable chemical structure image column
 * row index column
-* selected rows can be copy & pasted into Excel (Structure as SMILES)
-
-## Screenshots
-
-### Properties and row height
-
-Below images shows all the properties in the SD-file and the last row is higher
-to better fit the larger molecule:
-
-![variable row height](https://googledrive.com/host/0B1KuZlTEmhZNam93R1FRSFBWX28/propertiesAndRowHeight.png)
-
-### Viewing large SD-Files
-
-This screenshot is an example of a rather large file. See the row number on the
-left side of the table:
-
-![large file example](https://googledrive.com/host/0B1KuZlTEmhZNam93R1FRSFBWX28/largeFileExample.png)
-
-Scrolling remains smooth with very reasonable memory usage.
+* variable row heights
+* Support for very large sd-files with smooth scrolling
 
 ## Miscellaneous
 
@@ -59,4 +40,4 @@ You must add the full path. Above assumes Windows and that you put the jar file
 into the Program Files folder. If it still does not load increase the number in
 `-Xmx512m` further. It denotes amount of memory to use in megabytes.
 
-[1]: http://ggasoftware.com/opensource/indigo
+[1]: https://lifescience.opensource.epam.com/indigo/
