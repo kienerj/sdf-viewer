@@ -46,9 +46,9 @@ public class SdfTableModel extends AbstractTableModel {
     private final HashMap<Integer, SdfRecord> rowCache;
     private int cacheLowerBound = 0;
     @Getter
-    private int imageWidth = 200;
+    private int imageWidth = 300;
     @Getter
-    private int imageHeight = 200;
+    private int imageHeight = 150;
 
     public SdfTableModel(SdfReader sdfReader) {
         this.sdfReader = sdfReader;
@@ -66,8 +66,10 @@ public class SdfTableModel extends AbstractTableModel {
         indigo.setOption("render-coloring", true);
         indigo.setOption("render-margins", 5, 5);
         indigo.setOption("render-stereo-style", "none");
+        indigo.setOption("render-bond-length",75);
+        indigo.setOption("render-relative-thickness", 1.5);
         indigo.setOption("render-image-size", imageWidth, imageHeight);
-        indigo.setOption("image-resolution", 300);
+        indigo.setOption("image-resolution", 96);
         // init row cache
         this.rowCache = new HashMap<>();
         updateRowCache(0, true);
