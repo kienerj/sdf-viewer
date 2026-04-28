@@ -67,6 +67,7 @@ public class SdfViewer extends javax.swing.JFrame {
         if (lastOpenDir != null) {
             fileChooser.setCurrentDirectory(lastOpenDir);
         }
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     /**
