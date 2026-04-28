@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -95,11 +96,7 @@ public class SdfViewer extends javax.swing.JFrame {
 
         loadFileMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         loadFileMenuItem.setText("Load SD-File...");
-        loadFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadFileMenuItemActionPerformed(evt);
-            }
-        });
+        loadFileMenuItem.addActionListener(this::loadFileMenuItemActionPerformed);
         jMenu1.add(loadFileMenuItem);
 
         jMenuBar1.add(jMenu1);
@@ -108,11 +105,7 @@ public class SdfViewer extends javax.swing.JFrame {
 
         saveIndexMenuItem.setSelected(true);
         saveIndexMenuItem.setText("Save Index");
-        saveIndexMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveIndexMenuItemActionPerformed(evt);
-            }
-        });
+        saveIndexMenuItem.addActionListener(this::saveIndexMenuItemActionPerformed);
         jMenu2.add(saveIndexMenuItem);
 
         jMenuBar1.add(jMenu2);
@@ -182,15 +175,15 @@ public class SdfViewer extends javax.swing.JFrame {
                 if (!success) {
                     // directory were this jar file is stored
                     // use it to save settings to same dir.
-                    settingsDir = new File(ClassLoader.getSystemClassLoader()
-                            .getResource(".").getPath());
+                    settingsDir = new File(Objects.requireNonNull(ClassLoader.getSystemClassLoader()
+                            .getResource(".")).getPath());
                 }
             }
         } else {
             // directory were this jar file is stored
             // use it to save settings to same dir.
-            settingsDir = new File(ClassLoader.getSystemClassLoader()
-                    .getResource(".").getPath());
+            settingsDir = new File(Objects.requireNonNull(ClassLoader.getSystemClassLoader()
+                    .getResource(".")).getPath());
         }
     }
 
@@ -214,7 +207,7 @@ public class SdfViewer extends javax.swing.JFrame {
         Properties settings = new Properties();
         File settingsFile = new File(settingsDir + "/" + SETTINGS_FILE);
         if (settingsFile.exists()) {
-            try (FileInputStream in = new FileInputStream(settingsFile);) {
+            try (FileInputStream in = new FileInputStream(settingsFile)) {
                 settings.load(in);
                 FileSystemView fw = fileChooser.getFileSystemView(); // for default open directory
                 String lastOpenDirPath = settings.getProperty("lastOpenDir", fw.getDefaultDirectory().toString());
@@ -249,12 +242,7 @@ public class SdfViewer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new SdfViewer().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new SdfViewer().setVisible(true));
     }
 
     private class SdfLoader extends SwingWorker<JTable, Void> {

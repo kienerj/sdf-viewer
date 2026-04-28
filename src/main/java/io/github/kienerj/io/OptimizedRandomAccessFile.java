@@ -41,7 +41,7 @@ import java.io.RandomAccessFile;
  * </p>
  * If the underlying {@link java.nio.channels.FileChannel
  * <code>FileChannel</code>} is manipulated, the behavior is unpredictable. 
- * Therefore this class does not expose the <code>getFileChannel()</code> method
+ * Therefore, this class does not expose the <code>getFileChannel()</code> method
  * of <code>RandomAccessFile</code>. </p>
  *
  * @author Joos Kiener <Joos.Kiener@gmail.com>
@@ -63,7 +63,7 @@ public class OptimizedRandomAccessFile {
      *
      * @param name path to the text file
      * @param mode r, rw, rws, rwd
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException when the file does not exist
      */
     public OptimizedRandomAccessFile(String name, String mode)
             throws FileNotFoundException {
@@ -74,9 +74,9 @@ public class OptimizedRandomAccessFile {
      *
      * see {@link RandomAccessFile#RandomAccessFile(File,String)}
      *
-     * @param file
-     * @param mode
-     * @throws FileNotFoundException
+     * @param file the File to read
+     * @param mode r, rw, rws, rwd
+     * @throws FileNotFoundException when the file does not exist
      */
     public OptimizedRandomAccessFile(File file, String mode)
             throws FileNotFoundException {
@@ -195,7 +195,7 @@ public class OptimizedRandomAccessFile {
      * <code>len</code> is negative, or <code>len</code> is greater than
      * <code>b.length - off</code>
      */
-    public synchronized int read(byte b[], int off, int len) throws IOException {
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
         //resetPosition();
         if ((off < 0) || (off > b.length) || (len < 0)
                 || ((off + len) > b.length) || ((off + len) < 0)) {
@@ -235,7 +235,7 @@ public class OptimizedRandomAccessFile {
      * if some other I/O error occurs.
      * @exception NullPointerException If <code>b</code> is <code>null</code>.
      */
-    public synchronized int read(byte b[]) throws IOException {
+    public synchronized int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
@@ -252,7 +252,7 @@ public class OptimizedRandomAccessFile {
      * the bytes.
      * @exception IOException if an I/O error occurs.
      */
-    public synchronized final void readFully(byte b[]) throws IOException {
+    public synchronized final void readFully(byte[] b) throws IOException {
         resetPosition();
         raf.readFully(b);
     }
@@ -272,7 +272,7 @@ public class OptimizedRandomAccessFile {
      * the bytes.
      * @exception IOException if an I/O error occurs.
      */
-    public synchronized final void readFully(byte b[], int off, int len) throws IOException {
+    public synchronized final void readFully(byte[] b, int off, int len) throws IOException {
         resetPosition();
         raf.readFully(b, off, len);
     }
@@ -327,9 +327,6 @@ public class OptimizedRandomAccessFile {
         int skipped = n - r;
         actualFilePointer += skipped;
         return skipped;
-
-//        resetPosition();
-//        return raf.skipBytes(n);
     }
 
     // 'Write' primitives
@@ -353,7 +350,7 @@ public class OptimizedRandomAccessFile {
      * @param b the data.
      * @exception IOException if an I/O error occurs.
      */
-    public synchronized void write(byte b[]) throws IOException {
+    public synchronized void write(byte[] b) throws IOException {
         resetPosition();
         raf.write(b, 0, b.length);
     }
@@ -368,7 +365,7 @@ public class OptimizedRandomAccessFile {
      * @param len the number of bytes to write.
      * @exception IOException if an I/O error occurs.
      */
-    public synchronized void write(byte b[], int off, int len) throws IOException {
+    public synchronized void write(byte[] b, int off, int len) throws IOException {
         resetPosition();
         raf.write(b, off, len);
     }
@@ -455,8 +452,8 @@ public class OptimizedRandomAccessFile {
      *
      * @exception IOException if an I/O error occurs.
      *
-     * @revised 1.4
-     * @spec JSR-51
+     * {@code @revised} 1.4
+     * {@code @spec} JSR-51
      */
     public void close() throws IOException {
         raf.close();
@@ -730,14 +727,13 @@ public class OptimizedRandomAccessFile {
 
         boolean omitLF = ignoreLF || skipLF;
 
-        bufferLoop:
-        for (;;) {
+        for (; ; ) {
 
             if (nextChar >= nChars) {
                 fill();
             }
             if (nextChar >= nChars) { /* EOF */
-                if (s != null && s.length() > 0) {
+                if (s != null && !s.isEmpty()) {
                     //EOF -> hence no need to adjust position in file
                     // changed by fill()
                     return s.toString();
@@ -756,12 +752,11 @@ public class OptimizedRandomAccessFile {
             skipLF = false;
             omitLF = false;
 
-            charLoop:
             for (i = nextChar; i < nChars; i++) {
                 c = charBuffer[i];
                 if ((c == '\n') || (c == '\r')) {
                     eol = true;
-                    break charLoop;
+                    break;
                 }
             }
 
@@ -800,8 +795,7 @@ public class OptimizedRandomAccessFile {
     /**
      * see {@link #readLine(boolean) readLine(boolean ignoreLF)}
      *
-     * @return
-     * @throws IOException
+     * @throws IOException when an issue happens reading the line
      */
     public synchronized String readLine() throws IOException {
         return readLine(false);
