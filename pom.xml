@@ -8,6 +8,9 @@
     <packaging>jar</packaging>
 
     <name>sdf-viewer</name>
+    <organization><name>Givaudan</name></organization>
+    <inceptionYear>2013</inceptionYear>
+    <description>With FreeSDFViewer one can quickly view and scroll through large sd-files.</description>
     <url>https://maven.apache.org</url>
 
     <scm>
@@ -69,6 +72,41 @@
                         <goals>
                             <goal>create</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <executions>
+                    <execution>
+                        <id>l4j-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/FreeSDFViewer.exe</outfile>
+                            <jar>target/FreeSDFViewer.jar</jar>
+                            <errTitle>FreeSDFViewer</errTitle>
+                            <classPath>
+                                <mainClass>io.github.kienerj.sdf_viewer.SdfViewer</mainClass>
+                                <addDependencies>true</addDependencies>
+                            </classPath>
+                            <jre>
+                                <minVersion>21</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>2.0.0.0</fileVersion>
+                                <fileDescription>FreeSDFViewer executable for Windows</fileDescription>
+                                <txtProductVersion>${buildNumber}</txtProductVersion>
+                                <productName>FreeSDFViewer</productName>
+                                <internalName>sdf-viewer</internalName>
+                                <originalFilename>FreeSDFViewer.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
