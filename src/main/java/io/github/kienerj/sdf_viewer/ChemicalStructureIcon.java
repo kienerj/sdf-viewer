@@ -19,14 +19,14 @@ package io.github.kienerj.sdf_viewer;
 import com.epam.indigo.Indigo;
 import com.epam.indigo.IndigoObject;
 import com.epam.indigo.IndigoRenderer;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
+
+import java.awt.*;
 import java.awt.image.ImageObserver;
 import javax.swing.ImageIcon;
+import java.awt.geom.AffineTransform;
+
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
 
 /**
  * <p>
@@ -42,10 +42,11 @@ import javax.swing.ImageIcon;
  */
 public class ChemicalStructureIcon extends ImageIcon {
 
+    private static final XLogger logger = XLoggerFactory.getXLogger("ChemicalStructureIcon");
     private final Indigo indigo;
     private final IndigoRenderer renderer;
     private final String structureData;
-    private final String smiles;
+    private final IndigoObject mol;
     private int width;
     private int height;
 
@@ -54,11 +55,11 @@ public class ChemicalStructureIcon extends ImageIcon {
      * <code>ChemicalStructureIcon</code> using the passed in parameters for
      * rendering the image. </p>
      *
-     * @param structureData
-     * @param indigo
-     * @param renderer
-     * @param width
-     * @param height
+     * @param structureData the chemical structure (mol block) for this row
+     * @param indigo the indigo instance to use for rendering
+     * @param renderer the indigo renderer to use for rendering
+     * @param width initial width of the image
+     * @param height initial height of the image
      */
     public ChemicalStructureIcon(String structureData, Indigo indigo,
             IndigoRenderer renderer, int width, int height) {
@@ -69,8 +70,9 @@ public class ChemicalStructureIcon extends ImageIcon {
         this.width = width;
         this.height = height;
         indigo.setOption("render-image-size", width, height);
-        IndigoObject mol = indigo.loadMolecule(structureData);
-        this.smiles = getSmiles(mol);
+        indigo.setOption("image-resolution", 96);
+        mol = indigo.loadMolecule(structureData);
+        String smiles = getSmiles(mol);
         setDescription(smiles);
         Image image = renderImage();
         setImage(image);
@@ -99,7 +101,7 @@ public class ChemicalStructureIcon extends ImageIcon {
          *      8  8  0  0  1  0  0  0  0  0999 V2000
          *
          * Below we optionally remove the extensions as they do not belong to
-         * the smiles specification. In above case they are from chemaxon.
+         * the SMILES specification. In above case they are from chemaxon.
          */
         int firstSpaceIndex = smiles.indexOf(" ");
         if (firstSpaceIndex != -1) {
@@ -132,8 +134,19 @@ public class ChemicalStructureIcon extends ImageIcon {
         x = insets.left;
         y = insets.top;
 
-        int w = c.getWidth() - x - insets.right;
-        int h = c.getHeight() - y - insets.bottom;
+        Graphics2D g2d = (Graphics2D) g;
+        AffineTransform transform = g2d.getTransform();
+        logger.debug(transform.toString());
+
+        // Dimensions for table cell size for Graphics2d
+        int wg = c.getWidth() - x - insets.right;
+        int hg = c.getHeight() - y - insets.bottom;
+        // Dimensions for indigo renderer taking into account dpi scaling
+        // This is required so that images look sharp and are not getting manipulated by awt
+        int w = (int) (wg * transform.getScaleX());
+        int h = (int) (hg * transform.getScaleY());
+        logger.debug("Rendering Chemical Structure image: W: {} H: {} scaleX: {} scaleY: {}",
+                w, h, transform.getScaleX(), transform.getScaleY());
 
         if (w != width || h != height) {
             if (w < 16 || h < 16) {
@@ -142,29 +155,25 @@ public class ChemicalStructureIcon extends ImageIcon {
             }
             width = w;
             height = h;
-            indigo.setOption("render-image-size", w, h);
-            image = renderImage();
-            setImage(image);
         }
 
+        indigo.setOption("render-image-size", w, h);
+        image = renderImage();
+        setImage(image);
         ImageObserver io = getImageObserver();
-        g.drawImage(image, x, y, w, h, io == null ? c : io);
+        g.drawImage(image, x, y, wg, hg, io == null ? c : io);
     }
 
-    private Image renderImage() {
+    private Image renderImage()  {
+
         Image image = null;
         if (structureData != null) {
-            IndigoObject mol = indigo.loadMolecule(structureData);
             if (mol != null) {
                 if (!mol.hasCoord()) {
                     mol.layout();
                 }
                 byte[] imageData = renderer.renderToBuffer(mol);
-                // see ImageIcon constructor
                 image = Toolkit.getDefaultToolkit().createImage(imageData);
-                if (image == null) {
-                    return null;
-                }
             }
         }
         return image;
