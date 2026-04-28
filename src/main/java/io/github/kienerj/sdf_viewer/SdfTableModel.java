@@ -181,14 +181,14 @@ public class SdfTableModel extends AbstractTableModel {
             this.cacheLowerBound = cacheLowerBound;
         } else if (this.cacheLowerBound - cacheLowerBound < 0) {
             // scroll down (to bigger index)
-            removeFromCache(this.cacheLowerBound, LOAD_THRESHOLD);
+            removeFromCache(this.cacheLowerBound);
             firstRow = cacheLowerBound + CACHE_SIZE - LOAD_THRESHOLD;
             lastRow = cacheLowerBound + CACHE_SIZE - 1;
             addRowsToCache(firstRow, lastRow);
             this.cacheLowerBound = cacheLowerBound;
         } else if (this.cacheLowerBound - cacheLowerBound > 0) {
             //scroll up (to smaller index)
-            removeFromCache(this.cacheLowerBound + CACHE_SIZE - LOAD_THRESHOLD, LOAD_THRESHOLD);
+            removeFromCache(this.cacheLowerBound + CACHE_SIZE - LOAD_THRESHOLD);
             firstRow = cacheLowerBound;
             lastRow = cacheLowerBound + LOAD_THRESHOLD - 1;
             addRowsToCache(firstRow, lastRow);
@@ -221,10 +221,10 @@ public class SdfTableModel extends AbstractTableModel {
         }
     }
 
-    private void removeFromCache(int startIndex, int numRecords) {
+    private void removeFromCache(int startIndex) {
 
-        logger.entry(startIndex, numRecords);
-        int endIndex = startIndex + numRecords;
+        logger.entry(startIndex, SdfTableModel.LOAD_THRESHOLD);
+        int endIndex = startIndex + SdfTableModel.LOAD_THRESHOLD;
         HashSet<Integer> keys = new HashSet<>();
         for (int i = startIndex; i < endIndex; i++) {
             keys.add(i);
