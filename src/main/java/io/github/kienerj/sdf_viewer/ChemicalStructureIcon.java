@@ -136,7 +136,7 @@ public class ChemicalStructureIcon extends ImageIcon {
 
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform transform = g2d.getTransform();
-        logger.debug(transform.toString());
+        //logger.debug(transform.toString());
 
         // Dimensions for table cell size for Graphics2d
         int wg = c.getWidth() - x - insets.right;
@@ -145,8 +145,8 @@ public class ChemicalStructureIcon extends ImageIcon {
         // This is required so that images look sharp and are not getting manipulated by awt
         int w = (int) (wg * transform.getScaleX());
         int h = (int) (hg * transform.getScaleY());
-        logger.debug("Rendering Chemical Structure image: W: {} H: {} scaleX: {} scaleY: {}",
-                w, h, transform.getScaleX(), transform.getScaleY());
+        //logger.debug("Rendering Chemical Structure image: W: {} H: {} scaleX: {} scaleY: {}",
+                //w, h, transform.getScaleX(), transform.getScaleY());
 
         if (w != width || h != height) {
             if (w < 16 || h < 16) {
