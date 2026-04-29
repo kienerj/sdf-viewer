@@ -42,7 +42,16 @@ public class SdfFileFilter extends FileFilter {
         if (i > 0) {
             extension = fileName.substring(i + 1);
         }
-        return extension.equals("sdf");
+
+        if (extension.equals("gz")) {
+            fileName = fileName.substring(0, i);
+            i = fileName.lastIndexOf('.');
+            if (i > 0) {
+                extension = fileName.substring(i + 1) + "." + extension;
+            }
+        }
+        return extension.equals("sdf") || extension.equals("sd")
+                || extension.equals("sdf.gz") || extension.equals("sd.gz");
     }
 
     /**
@@ -51,6 +60,6 @@ public class SdfFileFilter extends FileFilter {
      * @see FileView#getName
      */
     public String getDescription() {
-        return "SD-files: *.sdf";
+        return "SD-files: *.sdf, *.sd, *.gz";
     }
 }

@@ -19,6 +19,8 @@ package io.github.kienerj.sdf_reader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.util.zip.GZIPInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,6 +150,12 @@ public class SdfReader implements AutoCloseable {
      */
     public SdfReader(File file, boolean saveIndex, boolean reindex)
             throws IOException {
+
+        String fileExtension = getFileExtension(file);
+        if (fileExtension.equals("gz")) {
+            logger.info("Found a gzip compressed file. Decompressing to temp and using that file...");
+            file = decompressFile(file);
+        }
 
         this.file = file;
         this.saveIndex = saveIndex;
@@ -622,12 +630,12 @@ public class SdfReader implements AutoCloseable {
     }
 
     private void validateFile() throws IOException {
-        String extension = "";
-        String fileName = file.getName();
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileName.substring(i + 1);
+
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("File " + file.getAbsolutePath() + " is not a file.");
         }
+
+        String extension = getFileExtension(file);
 
         if (!extension.equals("sdf") && !extension.equals("sd")) {
             logger.warn("File has unexpected file extension: {}.", extension);
@@ -642,6 +650,37 @@ public class SdfReader implements AutoCloseable {
             String message = "File does not seem to be a valid V2000 or V3000 sd-file. No mol file version specifier found on line 4.";
             throw new IllegalArgumentException(message);
         }
+    }
+
+    private static String getFileExtension(File file) {
+        String extension = "";
+        String fileName = file.getName();
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1);
+        }
+        return extension;
+    }
+
+    private File decompressFile(File file) throws IOException {
+        logger.debug("Decompressing file {}...", file.getAbsolutePath());
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+        File sdf =  new File(tempDir, fileName);
+        GZIPInputStream gzStream = new GZIPInputStream(new FileInputStream(file));
+        FileOutputStream out = new FileOutputStream(sdf);
+
+        byte[] results = new byte[1024];
+        int count = gzStream.read(results);
+        while (count != -1) {
+            byte[] result = Arrays.copyOf(results, count);
+            out.write(result);
+            count = gzStream.read(results);
+        }
+        out.flush();
+        out.close();
+        gzStream.close();
+        return sdf;
     }
 
     /**
