@@ -629,18 +629,18 @@ public class SdfReader implements AutoCloseable {
             extension = fileName.substring(i + 1);
         }
 
-        if (extension.equals("sdf") || extension.equals("sd")) {
-            logger.info("SD-File seems to be valid.");
-        } else {
-            logger.warn("File extension is not 'sdf'. Analysing file contents...");
-            raf.readLine();
-            raf.readLine();
-            raf.readLine();
-            String line = raf.readLine();
-            if (!line.contains("V2000") || !line.contains("V3000")) {
-                String message = "File does not seem to be a valid V2000 or V3000 sd-file or the first record is an empty structure.";
-                throw new IllegalArgumentException(message);
-            }
+        if (!extension.equals("sdf") && !extension.equals("sd")) {
+            logger.warn("File has unexpected file extension: {}.", extension);
+        }
+
+        logger.debug("Validating file contents...");
+        raf.readLine();
+        raf.readLine();
+        raf.readLine();
+        String line = raf.readLine();
+        if (!line.contains("V2000") && !line.contains("V3000")) {
+            String message = "File does not seem to be a valid V2000 or V3000 sd-file. No mol file version specifier found on line 4.";
+            throw new IllegalArgumentException(message);
         }
     }
 
