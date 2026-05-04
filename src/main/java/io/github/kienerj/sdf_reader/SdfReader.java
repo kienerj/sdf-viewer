@@ -516,7 +516,7 @@ public class SdfReader implements AutoCloseable {
         try {
             raf.seek(startOffset);
             raf.read(buffer);
-            String record = new String(buffer, "US-ASCII");
+            String record = new String(buffer, "UTF-8");
             String[] lines = record.split(getLineSeparator(record));
 
             ArrayList<String> recordLines = new ArrayList<>(Arrays.asList(lines));
